@@ -34,7 +34,7 @@ y_dim = size(segmented_data_logical, 2); % Y dimension size
 z_dim = size(segmented_data_logical, 3);  % Z dimension size
 
 % Define the bottom 5 layers to place the ellipse
-bottom_layers = 1:20;
+bottom_layers = 1:8;
 
 % Define the ellipse parameters
 ellipse_buffer = 1.5;
@@ -63,7 +63,7 @@ for z = 1:z_dim
 end
 
 %% Export to STL
-smoothing_parameters = struct('mode',1, 'itt',10, 'lambda',1, 'sigma',1);
+smoothing_parameters = struct('mode',1, 'itt',10, 'lambda',0.1, 'sigma',0.1);
 
 ExportVoxelData(segmented_data_logical,... 'smoothing', smoothing_parameters,...
     'mesh_name', sprintf('processed_brain_%s', subject_name), 'output_dir', 'data_processed', 'pov', false);
