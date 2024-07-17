@@ -3,7 +3,7 @@ clear, clc, close all
 %% Load data and turn neural tissue into logical
 addpath(genpath('ExportVoxelData'))
 
-subject_name = 'kenneth';
+subject_name = 'ernie';
 
 segmented_data = niftiread(sprintf('data_raw/final_tissues_%s.nii.gz', subject_name));
 
@@ -11,6 +11,9 @@ segmented_data(segmented_data==2) = 1;
 segmented_data(segmented_data~=1) = 0;
 
 segmented_data_logical = logical(segmented_data);
+
+%% Rotate if necessary
+segmented_data_logical = permute(segmented_data_logical, [3,1,2]);
 
 %% Limit array size
 % Find the bounds
@@ -21,7 +24,7 @@ xMin = min(xIndices) - skull_buffer;
 xMax = max(xIndices) + skull_buffer;
 yMin = min(yIndices) - skull_buffer;
 yMax = max(yIndices) + skull_buffer;
-zMin = min(zIndices) + 70;
+zMin = min(zIndices) + 75;
 zMax = max(zIndices) + skull_buffer;
 
 % Crop the array
@@ -61,6 +64,9 @@ for z = 1:z_dim
     colormap([0 0 0; 1 1 1]); % Map 0 to white and 1 to black
     pause(0); % Pause to visualize each layer
 end
+
+%% Export to mat file
+save(sprintf('segmented_data_%s.mat', subject_name), 'segmented_data_logical')
 
 %% Export to STL
 smoothing_parameters = struct('mode',1, 'itt',10, 'lambda',0.1, 'sigma',0.1);
