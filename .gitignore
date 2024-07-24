@@ -370,3 +370,4 @@ $RECYCLE.BIN/
 
 # Matlab files
 *.asv
+*.mat
