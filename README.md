@@ -1,5 +1,5 @@
 # scan_to_stl
-Simple script and dependencies to translate anatomical scans to STL files for a 3D printer.
+Simple script and dependencies to translate segmented files based on T1 and T2 scans to STL files for a 3D printer.
 
 
 ## How to use
