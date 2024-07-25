@@ -69,7 +69,7 @@ for z = bottom_layers
     segmented_data_logical(:,:,z) = ellipse';
 end
 
-% Visualise the matrix (optional)
+% Visualise the matrix
 for z = 1:z_dim
     imagesc(segmented_data_logical(:,:,z));
     axis equal;
@@ -93,8 +93,8 @@ else
     output_name = sprintf('processed_brain_%s_x%.4f_y%.4f_z%.4f', subject_name, voxel_size_list(1), voxel_size_list(2), voxel_size_list(3));
 end
 
-
-smoothing_parameters = struct('mode',1, 'itt',100, 'lambda',0.06, 'sigma',1);
+% These are optimised for 3T files segmented by Charm
+smoothing_parameters = struct('mode',1, 'itt',100, 'lambda',0.05, 'sigma',1);
 
 ExportVoxelData(segmented_data_logical, 'method', 'geometric', 'smoothing', smoothing_parameters,...
     'mesh_name', output_name, 'output_dir', 'data_processed', ...
