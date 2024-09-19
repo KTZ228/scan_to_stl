@@ -10,10 +10,6 @@ output_location_subject = sprintf('%s/%s', output_location, subject_name);
 output_location_subject_tmp = sprintf('%s/tmp', output_location_subject);
 output_location_subject_stl = sprintf('%s/stl', output_location_subject);
 
-% Make directories for output
-mkdir(output_location_subject);
-mkdir(output_location_subject_stl);
-
 % Load correct version of freesurfer
 system('source /opt/freesurfer/7.3.2/SetUpFreeSurfer.sh');
 system('module load freesurfer');
@@ -35,6 +31,7 @@ system(sprintf('mri_tessellate %s/brainstem_cerebellum.mgz 1 %s/brainstem_cerebe
 system(sprintf('mris_smooth %s/brainstem_cerebellum_boxy %s/brainstem_cerebellum_surface', output_location_subject_tmp, output_location_subject_tmp));
 
 %% Convert these surface maps to STL files
+mkdir(output_location_subject_stl);
 % First for the left and the right hemisphere of the cortex
 system(sprintf('mris_convert %s/surf/lh.pial %s/left_hemisphere.stl', output_location_subject, output_location_subject_stl));
 system(sprintf('mris_convert %s/surf/rh.pial %s/right_hemisphere.stl', output_location_subject, output_location_subject_stl));
