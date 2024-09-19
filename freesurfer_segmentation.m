@@ -1,28 +1,42 @@
-# Set folder name to the to be segmented data
-folder_name=kenneth
-subfolder_name=freesurfer_output/3d_model
-full_folder_path=/home/affneu/kenvdzee/printing_brains/${folder_name}
+%% Set the subject_name according to the template 'number_name'
+% This is the only thing you should change if you formatted the names correctly
+subject_name = '1_kenneth';
 
-# See if this works
-source /opt/freesurfer/7.3.2/SetUpFreeSurfer.sh
-module load freesurfer
+%% Start segmentation
+input_location = sprintf('%s/data_raw', pwd);
+input_name_and_location = sprintf('%s/%s_T1w.nii.gz', input_location, subject_name);
+output_location = sprintf('%s/data_processed', pwd);
+output_location_subject = sprintf('%s/%s_freesurfer_output', output_location, subject_name);
+output_location_subject_tmp = sprintf('%s/tmp', output_location_subject);
+output_location_subject_stl = sprintf('%s/stl', output_location_subject);
 
-# Set export folder location
-export SUBJECTS_DIR=full_folder_path
+% Make directories for output
+mkdir(output_location_subject);
+mkdir(output_location_subject_stl);
 
-# Start the main freesurfer pipeline
-recon-all -i /SUBJECTS_DIR/${folder_name}_T1w.nii.gz -s freesurfer_output -all -cw256
+% Load correct version of freesurfer
+system('source /opt/freesurfer/7.3.2/SetUpFreeSurfer.sh');
+system('module load freesurfer');
 
-# Extract the cerebellum and brainstem from file containing subcortical surfacemaps
-mri_binarize --i /${full_folder_path}/freesurfer_output/mri/aseg.mgz --match 7 8 16 46 47 28 60 --o ${full_folder_path}/${subfolder_name}/brainstem_cerebellum.mgz
+% Send output location to freesurfer
+setenv('SUBJECTS_DIR', output_location);
 
-# Convert this to a surfacemap of the cerebellum and brainstem
-mri_tessellate /${full_folder_path}/${subfolder_name}/brainstem_cerebellum.mgz 1 /${full_folder_path}/${subfolder_name}/brainstem_cerebellum_boxy
+%% Start the recon-all pipeline from freesurfer
+system(sprintf('recon-all -i %s -s %s -all -cw256', input_name_and_location, subject_name));
 
-# Smooth the cerebellum and brainstem
-mris_smooth /${full_folder_path}/${subfolder_name}/brainstem_cerebellum_boxy /${full_folder_path}/${subfolder_name}/brainstem_cerebellum_surface
+%% Extract the cerebellum and brainstem
+% Extracts and combine them as one voxel object since surface maps don't exist
+system(sprintf('mri_binarize --i %s/mri/aseg.mgz --match 7 8 16 46 47 28 60 --o %s/brainstem_cerebellum.mgz', output_location_subject, output_location_subject_tmp));
 
-# Create STL files of the brainstem and cerebellum, the left and the right hemisphere of the cortex
-mris_convert /${full_folder_path}/freesurfer_output/surf/lh.pial /${full_folder_path}/${subfolder_name}/lelf_hemisphere.stl
-mris_convert /${full_folder_path}/freesurfer_output/surf/rh.pial /${full_folder_path}/${subfolder_name}/right_hemisphere.stl
-mris_convert /${full_folder_path}/${subfolder_name}/brainstem_cerebellum_surface /${full_folder_path}/${subfolder_name}/brainstem_cerebellum_surface.stl
+% Convert this to a boxy surface map
+system(sprintf('mri_tessellate %s/brainstem_cerebellum.mgz 1 %s/brainstem_cerebellum_boxy', output_location_subject_tmp, output_location_subject_tmp));
+
+% Smooth this boxy surface map to give the illusion of it being properly mapped as a surface
+system(sprintf('mris_smooth %s/brainstem_cerebellum_boxy %s/brainstem_cerebellum_surface', output_location_subject_tmp, output_location_subject_tmp));
+
+%% Convert these surface maps to STL files
+% First for the left and the right hemisphere of the cortex
+system(sprintf('mris_convert %s/surf/lh.pial %s/left_hemisphere.stl', output_location_subject, output_location_subject_stl));
+system(sprintf('mris_convert %s/surf/rh.pial %s/right_hemisphere.stl', output_location_subject, output_location_subject_stl));
+% And now for the brainstem and cerebellum
+system(sprintf('mris_convert %s/brainstem_cerebellum_surface %s/brainstem_cerebellum_surface.stl', output_location_subject_tmp, output_location_subject_stl));

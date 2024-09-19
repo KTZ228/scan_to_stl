@@ -10,7 +10,6 @@
 
 data_raw/
 data_processed/
-ExportVoxelData/ExportVoxelData/data_processed/
 
 #------------Python related ignores-----------#
 
