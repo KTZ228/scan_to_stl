@@ -1,12 +1,12 @@
 %% Set the subject_name according to the template 'number_name'
 % This is the only thing you should change if you formatted the names correctly
-subject_name = '1_kenneth';
+subject_name = '2_hilde';
 
 %% Start segmentation
 input_location = sprintf('%s/data_raw', pwd);
 input_name_and_location = sprintf('%s/%s_T1w.nii.gz', input_location, subject_name);
 output_location = sprintf('%s/data_processed', pwd);
-output_location_subject = sprintf('%s/%s_freesurfer_output', output_location, subject_name);
+output_location_subject = sprintf('%s/%s', output_location, subject_name);
 output_location_subject_tmp = sprintf('%s/tmp', output_location_subject);
 output_location_subject_stl = sprintf('%s/stl', output_location_subject);
 
